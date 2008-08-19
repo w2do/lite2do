@@ -1,0 +1,136 @@
+.\" manual page for lite2do, a lightweight text-based todo manager
+.\" Copyright (C) 2008 Jaromir Hradilek
+.\"
+.\" Permission is granted to copy, distribute and/or modify this document
+.\" under the terms of the GNU Free Documentation License, Version 1.2 or
+.\" any later version published by the Free Software Foundation;  with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+.\" 
+.\" A copy  of the license is included  as a file called FDL  in the main
+.\" directory of the lite2do source package.
+.\"
+.TH LITE2DO 1 "19 August 2008" "Version 0.1.0"
+.SH NAME
+lite2do \- a lightweight text-based todo manager
+.SH SYNOPSIS
+.B  lite2do
+.RI [ options ]
+.I  command
+.RI [ arguments ]
+.br
+.B  lite2do
+.BR \-h " | " \-v
+.SH DESCRIPTION
+.B  lite2do
+is a lightweight command-line todo manager written in Perl 5. Being based
+on w2do and fully compatible with its save file format, it tries to provide
+much simpler alternative for those who do not appreciate nor require w2do's
+complexity.
+.SH OPTIONS
+.TP
+.BR \-c ", " \-\-colour
+Use coloured output; this option is turned off by default, as most users do
+not usually fancy having bright colours in their terminal.
+.TP
+.BI \-s " file" "\fR,\fP \-\-savefile" " file"
+Use selected
+.I  file
+instead of the default
+.I  ~/.lite2do
+as a save file.
+.TP
+.BI \-f " colour" "\fR,\fP \-\-finished" " colour"
+Use selected
+.I  colour
+for finished tasks; available options are:
+.BR black ,
+.BR red ,
+.BR green ,
+.BR yellow ,
+.BR blue ,
+.BR magenta ,
+.BR cyan
+and
+.BR white .
+.TP
+.BI \-u " colour" "\fR,\fP \-\-unfinished" " colour"
+Use selected
+.I  colour
+for unfinished tasks; available options are:
+.BR black ,
+.BR red ,
+.BR green ,
+.BR yellow ,
+.BR blue ,
+.BR magenta ,
+.BR cyan
+and
+.BR white .
+.TP
+.BR \-h ", " \-\-help
+Display help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Display version information and exit.
+.SH COMMANDS
+.TP 
+.BI list " \fR[\fP@group\fR] [\fPtext\fR]\fP"
+Display items in the task list. All tasks are listed by default, but
+desired subset can be easily selected giving a group name, text pattern, or
+combination of both.
+.TP
+.BI add " \fR[\fP@group\fR] \fPtext"
+Add new item to the task list.
+.TP
+.BI change " id text"
+Change item with selected
+.I  id
+in the task list.
+.TP
+.BI finish " id"
+Mark item with selected
+.I  id
+as finished.
+.TP
+.BI remove " id"
+Remove item with selected
+.I  id
+from the task list.
+.TP
+.BI undo
+Revert last action. When invoked, the data are restored from the backup
+file (i.e.
+.I  ~/.lite2do.bak
+by default), which is deleted at the same time.
+.SH FILES
+.TP
+.I  ~/.lite2do
+Default save file.
+.TP
+.I  ~/.lite2do.bak
+Default backup file.
+.SH SEE ALSO
+.BR w2do (1),
+.BR w2html (1),
+.BR w2text (1),
+.BR perl (1).
+.SH BUGS
+To report bugs or even send patches, please visit the project homepage:
+<http://gitorious.org/projects/lite2do/>.
+.SH AUTHOR
+Written by Jaromir Hradilek <jhradilek@gmail.com>.
+.PP
+Permission is granted to copy, distribute and/or modify this document under
+the terms of the GNU Free Documentation License, Version 1.2 or any later
+version published by the Free Software Foundation; with no Invariant
+Sections, no Front-Cover Texts, and no Back-Cover Texts.
+.PP
+A copy of the license is included as a file called FDL in the main
+directory of the lite2do source package.
+.SH COPYRIGHT
+Copyright (C) 2008 Jaromir Hradilek
+.PP
+This program is free software; see the source for copying conditions. It is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
