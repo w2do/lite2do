@@ -203,7 +203,7 @@ sub add_task {
   my $group = shift || 'general';
   my $id    = choose_id();
 
-  my @data  = ("$group:anytime:3:f:$task:$id\n");
+  my @data  = (substr($group, 0, 10) . ":anytime:3:f:$task:$id\n");
 
   add_data(\@data);
   print "Task has been successfully added.\n";
