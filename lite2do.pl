@@ -131,9 +131,9 @@ sub choose_id {
 sub display_help {
   print << "END_HELP"
 Usage: $NAME [options] command [args]
+       $NAME -h | -v
 
 Commands:
-
   list [\@group] [text]     display items in the task list
   add  [\@group] text       add new item to the task list
   change id text           change item in the task list
@@ -142,7 +142,6 @@ Commands:
   undo                     revert last action
 
 Options:
-
   -c, --colour             use coloured output; turned off by default
   -s, --savefile file      use selected file instead of default ~/.lite2do
   -f, --finished colour    use selected colour for finished tasks; suppor-
