@@ -130,13 +130,13 @@ sub choose_id {
 # Display script help:
 sub display_help {
   print << "END_HELP"
-Usage: $NAME [options] command [args]
+Usage: $NAME [options] command [arguments]
        $NAME -h | -v
 
 Commands:
-  list [\@group] [text]     display items in the task list
-  add  [\@group] text       add new item to the task list
-  change id text           change item in the task list
+  list [\@group] [text...]  display items in the task list
+  add  [\@group] text...    add new item to the task list
+  change id text...        change item in the task list
   finish id                finish item in the task list
   remove id                remove item from the task list
   undo                     revert last action
