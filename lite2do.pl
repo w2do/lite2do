@@ -205,7 +205,7 @@ sub add_task {
   my @data  = (substr($group, 0, 10) . ":anytime:3:f:$task:$id\n");
 
   add_data(\@data);
-  print "Task has been successfully added.\n";
+  print "Task has been successfully added with id $id.\n";
 }
 
 # Change selected item in the task list:
