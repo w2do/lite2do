@@ -26,7 +26,7 @@ use Getopt::Long;
 
 # General script information:
 our $NAME      = basename($0, '.pl');                     # Script name.
-our $VERSION   = '0.1.0';                                 # Script version.
+our $VERSION   = '0.1.1';                                 # Script version.
 
 # General script settings:
 our $HOMEDIR   = $ENV{HOME} || $ENV{USERPROFILE} || '.';  # Home directory.
@@ -138,6 +138,7 @@ Commands:
   add  [\@group] text...    add new item to the task list
   change id text...        change item in the task list
   finish id                finish item in the task list
+  revive id                revive item in the task list
   remove id                remove item from the task list
   undo                     revert last action
 
@@ -246,6 +247,25 @@ sub finish_task {
   }
 }
 
+# Mark selected item in the task list as unfinished:
+sub revive_task {
+  my $id = shift;
+  my (@selected, @rest);
+
+  load_selection(\@selected, \@rest, $id);
+
+  if (@selected) {
+    pop(@selected) =~ /^([^:]*):([^:]*):([1-5]):[ft]:(.*):\d+$/;
+    push(@rest, "$1:$2:$3:f:$4:$id\n");
+
+    save_data(\@rest);
+    print "Task has been revived.\n";
+  }
+  else {
+    print "No matching task found.\n";
+  }
+}
+
 # Remove selected item from the task list:
 sub remove_task {
   my $id = shift;
@@ -306,6 +326,7 @@ elsif ($command =~ /^add\s+@(\S+)\s+(\S.*)/)    { add_task($2, $1); }
 elsif ($command =~ /^add\s+(\S.*)/)             { add_task($1); }
 elsif ($command =~ /^change\s+(\d+)\s+(\S.*)/)  { change_task($1, $2); }
 elsif ($command =~ /^finish\s+(\d+)/)           { finish_task($1); }
+elsif ($command =~ /^revive\s+(\d+)/)           { revive_task($1); }
 elsif ($command =~ /^remove\s+(\d+)/)           { remove_task($1); }
 elsif ($command =~ /^undo\s*$/)                 { revert_last_action(); }
 else  {
