@@ -50,15 +50,22 @@ $SIG{__WARN__} = sub {
 sub load_selection {
   my ($selected, $rest, $id, $group, $task) = @_;
 
+  # Escape reserved characters:
   $group =~ s/([\\\^\.\$\|\(\)\[\]\*\+\?\{\}])/\\$1/g if $group;
   $task  =~ s/([\\\^\.\$\|\(\)\[\]\*\+\?\{\}])/\\$1/g if $task;
 
+  # Use default pattern when none is provided:
   $id    ||= '\d+';
   $group ||= '[^:]*';
   $task  ||= '';
 
+  # Open the save file for reading:
   if (open(SAVEFILE, "$savefile")) {
+
+    # Process each line:
     while (my $line = <SAVEFILE>) {
+
+      # Check whether the line matches given pattern:
       if ($line =~ /^$group:[^:]*:[1-5]:[ft]:.*$task.*:$id$/i) {
         push(@$selected, $line);
       }
@@ -67,6 +74,7 @@ sub load_selection {
       }
     }
 
+    # Close the save file:
     close(SAVEFILE);
   }
 }
@@ -75,16 +83,22 @@ sub load_selection {
 sub save_data {
   my $data = shift;
 
+  # Backup the save file:
   copy($savefile, "$savefile$backext") if (-r $savefile);
 
+  # Open the save file for writing:
   if (open(SAVEFILE, ">$savefile")) {
+
+    # Write data to the save file:
     foreach my $line (@$data) {
       print SAVEFILE $line;
     }
 
+    # Close the save file:
     close(SAVEFILE);
   }
   else {
+    # Report failure and exit:
     exit_with_error("Unable to write to `$savefile'.", 13);
   }
 }
@@ -93,16 +107,22 @@ sub save_data {
 sub add_data {
   my $data = shift;
 
+  # Backup the save file:
   copy($savefile, "$savefile$backext") if (-r $savefile);
 
+  # Open the save file for appending:
   if (open(SAVEFILE, ">>$savefile")) {
+
+    # Write data to the save file:
     foreach my $line (@$data) {
       print SAVEFILE $line;
     }
 
+    # Close the save file:
     close(SAVEFILE);
   }
   else {
+    # Report failure and exit:
     exit_with_error("Unable to write to `$savefile'.", 13);
   }
 }
@@ -112,18 +132,24 @@ sub choose_id {
   my @used   = ();
   my $chosen = 1;
 
+  # Open the save file for reading:
   if (open(SAVEFILE, "$savefile")) {
+
+    # Build the list of used IDs:
     while (my $line = <SAVEFILE>) {
       push(@used, int($1)) if ($line =~ /:(\d+)$/);
     }
 
+    # Close the save file:
     close(SAVEFILE);
 
+    # Find first unused ID:
     foreach my $id (sort {$a <=> $b} @used) {
       $chosen++ if ($chosen == $id);
     }
   }
 
+  Return the result:
   return $chosen;
 }
 
@@ -172,15 +198,26 @@ sub list_tasks {
   my ($group, $task) = @_;
   my (@selected, $state);
 
+  # Load matching tasks:
   load_selection(\@selected, undef, undef, $group, $task);
 
+  # Check whether the list is not empty:
   if (@selected) {
+
+    # Process each task:
     foreach my $line (sort @selected) {
+
+      # Parse the task record:
       $line   =~ /^([^:]*):[^:]*:[1-5]:([ft]):(.*):(\d+)$/;
       $state  = ($2 eq 'f') ? '-' : 'f';
       
+      # Check whether to use coloured output:
       if ($coloured) {
+
+        # Decide which colour to use:
         my $colour = ($2 eq 'f') ? $undone : $done;
+
+        # Print the task entry:
         print  colored (sprintf("%2d. ", $4), "bold"),
                colored ("\@$1 ",              "bold $colour"),
                colored ("[$state]",           "bold"),
@@ -188,11 +225,13 @@ sub list_tasks {
                "\n";
       }
       else {
+        # Print the task entry:
         printf "%2d. @%s [%s]: %s\n", $4, $1, $state, $3;
       }
     }
   }
   else {
+    # Report empty list:
     print "No matching task found.\n";
   }
 }
@@ -203,9 +242,13 @@ sub add_task {
   my $group = shift || 'general';
   my $id    = choose_id();
 
+  # Create the task record:
   my @data  = (substr($group, 0, 10) . ":anytime:3:f:$task:$id\n");
 
+  # Add data to the end of the save file:
   add_data(\@data);
+
+  # Report success:
   print "Task has been successfully added with id $id.\n";
 }
 
@@ -214,16 +257,26 @@ sub change_task {
   my ($id, $task) = @_;
   my (@selected, @rest);
 
+  # Load tasks:
   load_selection(\@selected, \@rest, $id);
 
+  # Check whether the list is not empty:
   if (@selected) {
+
+    # Parse the task record:
     pop(@selected) =~ /^([^:]*):([^:]*):([1-5]):([ft]):.*:\d+$/;
+
+    # Update the task record:
     push(@rest, "$1:$2:$3:$4:$task:$id\n");
 
+    # Store data to the save file:
     save_data(\@rest);
+
+    # Report success:
     print "Task has been successfully changed.\n";
   }
   else {
+    # Report empty list:
     print "No matching task found.\n";
   }
 }
@@ -233,16 +286,26 @@ sub finish_task {
   my $id = shift;
   my (@selected, @rest);
 
+  # Load tasks:
   load_selection(\@selected, \@rest, $id);
 
+  # Check whether the list is not empty:
   if (@selected) {
+
+    # Parse the task record:
     pop(@selected) =~ /^([^:]*):([^:]*):([1-5]):[ft]:(.*):\d+$/;
+
+    # Update the task record:
     push(@rest, "$1:$2:$3:t:$4:$id\n");
 
+    # Store data to the save file:
     save_data(\@rest);
+
+    # Report success:
     print "Task has been finished.\n";
   }
   else {
+    # Report empty list:
     print "No matching task found.\n";
   }
 }
@@ -252,16 +315,26 @@ sub revive_task {
   my $id = shift;
   my (@selected, @rest);
 
+  # Load tasks:
   load_selection(\@selected, \@rest, $id);
 
+  # Check whether the list is not empty:
   if (@selected) {
+
+    # Parse the task record:
     pop(@selected) =~ /^([^:]*):([^:]*):([1-5]):[ft]:(.*):\d+$/;
+
+    # Update the task record:
     push(@rest, "$1:$2:$3:f:$4:$id\n");
 
+    # Store data to the task list:
     save_data(\@rest);
+
+    # Report success:
     print "Task has been revived.\n";
   }
   else {
+    # Report empty list:
     print "No matching task found.\n";
   }
 }
@@ -271,23 +344,34 @@ sub remove_task {
   my $id = shift;
   my (@selected, @rest);
 
+  # Load tasks:
   load_selection(\@selected, \@rest, $id);
 
+  # Check whether the list is not empty:
   if (@selected) {
+
+    # Store data to the save file:
     save_data(\@rest);
+
+    # Report success:
     print "Task has been successfully removed.\n";
   }
   else {
+    # Report empty list:
     print "No matching task found.\n";
   }
 }
 
 # Revert last action:
 sub revert_last_action {
+
+  # Try to restore data from tha backup:
   if (move("$savefile$backext", $savefile)) {
+    # Report success:
     print "Last action has been successfully reverted.\n";
   }
   else {
+    # Report failure:
     print "Already at oldest change.\n";
   }
 }
