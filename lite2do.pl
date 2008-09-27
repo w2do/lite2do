@@ -149,7 +149,7 @@ sub choose_id {
     }
   }
 
-  Return the result:
+  # Return the result:
   return $chosen;
 }
 
