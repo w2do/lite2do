@@ -9,7 +9,7 @@
 .\" A copy  of the license is included  as a file called FDL  in the main
 .\" directory of the lite2do source package.
 .\"
-.TH LITE2DO 1 "6 September 2008" "Version 0.1.1"
+.TH LITE2DO 1 "5 October 2008" "Version 0.1.1"
 .SH NAME
 lite2do \- a lightweight text-based todo manager
 .SH SYNOPSIS
@@ -26,6 +26,47 @@ is a lightweight command-line todo manager written in Perl 5. Being based
 on w2do and fully compatible with its save file format, it tries to provide
 much simpler alternative for those who do not appreciate nor require w2do's
 complexity.
+.SH COMMANDS
+.TP 
+.BI list " \fR[\fP@group\fR] [\fPtext\fR...]\fP"
+Display items in the task list. All tasks are listed by default, but
+desired subset can be easily selected giving a group name, text pattern, or
+combination of both.
+.TP
+.BI add " \fR[\fP@group\fR] \fPtext\fR...\fP"
+Add new item to the task list.
+.TP
+.BI change " id text\fR...\fP"
+Change item with selected
+.I  id
+in the task list.
+.TP
+.BI finish " id"
+Mark item with selected
+.I  id
+as finished.
+.TP
+.BI revive " id"
+Mark item with selected
+.I  id
+as unfinished.
+.TP
+.BI remove " id"
+Remove item with selected
+.I  id
+from the task list.
+.TP
+.BI undo
+Revert last action. When invoked, the data are restored from the backup
+file (i.e.
+.I  ~/.lite2do.bak
+by default), which is deleted at the same time.
+.TP
+.BI help
+Display help message.
+.TP
+.BI version
+Display version information.
 .SH OPTIONS
 .TP
 .BR \-c ", " \-\-colour
@@ -72,41 +113,6 @@ Display help message and exit.
 .TP
 .BR \-v ", " \-\-version
 Display version information and exit.
-.SH COMMANDS
-.TP 
-.BI list " \fR[\fP@group\fR] [\fPtext\fR...]\fP"
-Display items in the task list. All tasks are listed by default, but
-desired subset can be easily selected giving a group name, text pattern, or
-combination of both.
-.TP
-.BI add " \fR[\fP@group\fR] \fPtext\fR...\fP"
-Add new item to the task list.
-.TP
-.BI change " id text\fR...\fP"
-Change item with selected
-.I  id
-in the task list.
-.TP
-.BI finish " id"
-Mark item with selected
-.I  id
-as finished.
-.TP
-.BI revive " id"
-Mark item with selected
-.I  id
-as unfinished.
-.TP
-.BI remove " id"
-Remove item with selected
-.I  id
-from the task list.
-.TP
-.BI undo
-Revert last action. When invoked, the data are restored from the backup
-file (i.e.
-.I  ~/.lite2do.bak
-by default), which is deleted at the same time.
 .SH FILES
 .TP
 .I  ~/.lite2do

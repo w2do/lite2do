@@ -67,9 +67,11 @@ sub load_selection {
 
       # Check whether the line matches given pattern:
       if ($line =~ /^$group:[^:]*:[1-5]:[ft]:.*$task.*:$id$/i) {
+        # Add the line to selected tasks:
         push(@$selected, $line);
       }
       else {
+        # Add the line to unselected tasks:
         push(@$rest, $line);
       }
     }
@@ -390,13 +392,15 @@ Getopt::Long::Configure('no_auto_abbrev', 'no_ignore_case', 'bundling');
 
 # Parse command line options:
 GetOptions(
+  # General options:
+  'help|h'         => sub { display_help();    exit 0 },
+  'version|v'      => sub { display_version(); exit 0 },
+
+  # Additional options:
   'savefile|s=s'   => \$savefile,
   'colour|color|c' => \$coloured,
   'finished|f=s'   => \$done,
   'unfinished|u=s' => \$undone,
-
-  'help|h'         => sub { display_help();    exit 0 },
-  'version|v'      => sub { display_version(); exit 0 },
 );
 
 # Get command line arguments:
@@ -413,7 +417,10 @@ elsif ($command =~ /^finish\s+(\d+)/)           { finish_task($1); }
 elsif ($command =~ /^revive\s+(\d+)/)           { revive_task($1); }
 elsif ($command =~ /^remove\s+(\d+)/)           { remove_task($1); }
 elsif ($command =~ /^undo\s*$/)                 { revert_last_action(); }
+elsif ($command =~ /^help\s*$/)                 { display_help(); }
+elsif ($command =~ /^version\s*$/)              { display_version(); }
 else  {
+  # Report invalid command:
   exit_with_error("Invalid command: $command\n" .
                   "Try `--help' for more information.", 22);
 }
