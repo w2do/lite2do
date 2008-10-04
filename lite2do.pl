@@ -26,7 +26,7 @@ use Getopt::Long;
 
 # General script information:
 our $NAME      = basename($0, '.pl');                     # Script name.
-our $VERSION   = '0.1.1';                                 # Script version.
+our $VERSION   = '1.0.0';                                 # Script version.
 
 # General script settings:
 our $HOMEDIR   = $ENV{HOME} || $ENV{USERPROFILE} || '.';  # Home directory.
