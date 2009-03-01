@@ -25,8 +25,8 @@ use Term::ANSIColor;
 use Getopt::Long;
 
 # General script information:
-our $NAME      = basename($0, '.pl');                     # Script name.
-our $VERSION   = '1.0.0';                                 # Script version.
+use constant NAME    => basename($0, '.pl');              # Script name.
+use constant VERSION => '1.0.0';                          # Script version.
 
 # General script settings:
 our $HOMEDIR   = $ENV{HOME} || $ENV{USERPROFILE} || '.';  # Home directory.
@@ -43,8 +43,69 @@ my ($command, $response);
 
 # Signal handlers:
 $SIG{__WARN__} = sub {
-  exit_with_error((shift) . "Try `--help' for more information.", 22);
+  print STDERR NAME . ": " . (shift);
 };
+
+# Display given message and immediately terminate the script:
+sub exit_with_error {
+  my $message       = shift || 'An unspecified error has occurred.';
+  my $return_value  = shift || 1;
+
+  print STDERR NAME . ": $message\n";
+  exit $return_value;
+}
+
+# Display script help:
+sub display_help {
+  my $NAME = NAME;
+
+  # Print message to the STDOUT:
+  print << "END_HELP";
+Usage: $NAME [option...] command [argument...]
+       $NAME -h | -v
+
+Commands:
+  list [\@group] [text...]  display items in the task list
+  add  [\@group] text...    add new item to the task list
+  change id text...        change item in the task list
+  finish id                finish item in the task list
+  revive id                revive item in the task list
+  remove id                remove item from the task list
+  undo                     revert last action
+
+Options:
+  -c, --colour             use coloured output; turned off by default
+  -s, --savefile file      use selected file instead of default ~/.lite2do
+  -f, --finished colour    use selected colour for finished tasks; suppor-
+                           ted options are: black, green, yellow, magenta,
+                           red, blue, cyan, and white
+  -u, --unfinished colour  use selected colour for unfinished tasks
+  -h, --help               display this help and exit
+  -v, --version            display version information and exit
+END_HELP
+
+  # Return success:
+  return 1;
+}
+
+# Display script version:
+sub display_version {
+  my ($NAME, $VERSION) = (NAME, VERSION);
+
+  # Print message to the STDOUT:
+  print << "END_VERSION";
+$NAME $VERSION
+
+Copyright (C) 2008, 2009 Jaromir Hradilek
+This program is free software; see the source for copying conditions. It is
+distributed in the hope  that it will be useful,  but WITHOUT ANY WARRANTY;
+without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A PAR-
+TICULAR PURPOSE.
+END_VERSION
+
+  # Return success:
+  return 1;
+}
 
 # Load selected data from the save file:
 sub load_selection {
@@ -79,11 +140,14 @@ sub load_selection {
     # Close the save file:
     close(SAVEFILE);
   }
+
+  # Return success:
+  return 1;
 }
 
 # Save given data to the save file:
 sub save_data {
-  my $data = shift;
+  my $data = shift || die 'Missing argument';
 
   # Backup the save file:
   copy($savefile, "$savefile$backext") if (-r $savefile);
@@ -103,11 +167,14 @@ sub save_data {
     # Report failure and exit:
     exit_with_error("Unable to write to `$savefile'.", 13);
   }
+
+  # Return success:
+  return 1;
 }
 
 # Add given data to the end of the save file:
 sub add_data {
-  my $data = shift;
+  my $data = shift || die 'Missing argument';
 
   # Backup the save file:
   copy($savefile, "$savefile$backext") if (-r $savefile);
@@ -127,6 +194,9 @@ sub add_data {
     # Report failure and exit:
     exit_with_error("Unable to write to `$savefile'.", 13);
   }
+
+  # Return success:
+  return 1;
 }
 
 # Choose first available ID:
@@ -153,46 +223,6 @@ sub choose_id {
 
   # Return the result:
   return $chosen;
-}
-
-# Display script help:
-sub display_help {
-  print << "END_HELP"
-Usage: $NAME [options] command [arguments]
-       $NAME -h | -v
-
-Commands:
-  list [\@group] [text...]  display items in the task list
-  add  [\@group] text...    add new item to the task list
-  change id text...        change item in the task list
-  finish id                finish item in the task list
-  revive id                revive item in the task list
-  remove id                remove item from the task list
-  undo                     revert last action
-
-Options:
-  -c, --colour             use coloured output; turned off by default
-  -s, --savefile file      use selected file instead of default ~/.lite2do
-  -f, --finished colour    use selected colour for finished tasks; suppor-
-                           ted options are: black, green, yellow, magenta,
-                           red, blue, cyan, and white
-  -u, --unfinished colour  use selected colour for unfinished tasks
-  -h, --help               display this help and exit
-  -v, --version            display version information and exit
-END_HELP
-}
-
-# Display script version:
-sub display_version {
-  print << "END_VERSION";
-$NAME $VERSION
-
-Copyright (C) 2008 Jaromir Hradilek
-This program is free software; see the source for copying conditions. It is
-distributed in the hope  that it will be useful,  but WITHOUT ANY WARRANTY;
-without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A PAR-
-TICULAR PURPOSE.
-END_VERSION
 }
 
 # List items in the task list:
@@ -236,11 +266,14 @@ sub list_tasks {
     # Report empty list:
     print "No matching task found.\n";
   }
+
+  # Return success:
+  return 1;
 }
 
 # Add new item to the task list:
 sub add_task {
-  my $task  = shift || '';
+  my $task  = shift || die 'Missing argument';
   my $group = shift || 'general';
   my $id    = choose_id();
 
@@ -252,11 +285,15 @@ sub add_task {
 
   # Report success:
   print "Task has been successfully added with id $id.\n";
+
+  # Return success:
+  return 1;
 }
 
 # Change selected item in the task list:
 sub change_task {
-  my ($id, $task) = @_;
+  my $id   = shift || die 'Missing argument';
+  my $task = shift || die 'Missing argument';
   my (@selected, @rest);
 
   # Load tasks:
@@ -281,11 +318,14 @@ sub change_task {
     # Report empty list:
     print "No matching task found.\n";
   }
+
+  # Return success:
+  return 1;
 }
 
 # Mark selected item in the task list as finished:
 sub finish_task {
-  my $id = shift;
+  my $id = shift || die 'Missing argument';
   my (@selected, @rest);
 
   # Load tasks:
@@ -310,11 +350,14 @@ sub finish_task {
     # Report empty list:
     print "No matching task found.\n";
   }
+
+  # Return success:
+  return 1;
 }
 
 # Mark selected item in the task list as unfinished:
 sub revive_task {
-  my $id = shift;
+  my $id = shift || die 'Missing argument';
   my (@selected, @rest);
 
   # Load tasks:
@@ -339,11 +382,14 @@ sub revive_task {
     # Report empty list:
     print "No matching task found.\n";
   }
+
+  # Return success:
+  return 1;
 }
 
 # Remove selected item from the task list:
 sub remove_task {
-  my $id = shift;
+  my $id = shift || die 'Missing argument';
   my (@selected, @rest);
 
   # Load tasks:
@@ -362,11 +408,13 @@ sub remove_task {
     # Report empty list:
     print "No matching task found.\n";
   }
+
+  # Return success:
+  return 1;
 }
 
 # Revert last action:
 sub revert_last_action {
-
   # Try to restore data from tha backup:
   if (move("$savefile$backext", $savefile)) {
     # Report success:
@@ -376,15 +424,9 @@ sub revert_last_action {
     # Report failure:
     print "Already at oldest change.\n";
   }
-}
 
-# Display given message and immediately terminate the script:
-sub exit_with_error {
-  my $message = shift || 'An unspecified error has occurred.';
-  my $retval  = shift || 1;
-
-  print STDERR "$NAME: $message\n";
-  exit $retval;
+  # Return success:
+  return 1;
 }
 
 # Set up the option parser:
@@ -436,7 +478,7 @@ lite2do - a lightweight text-based todo manager
 
 =head1 SYNOPSIS
 
-B<lite2do> [I<options>] I<command> [I<argument>...]
+B<lite2do> [I<option>...] I<command> [I<argument>...]
 
 B<lite2do> B<-h> | B<-v>
 
