@@ -455,9 +455,9 @@ $command = join(' ', @ARGV);
 # Parse command:
 if    ($command =~ /^(|list)\s*$/)              { list_tasks(); }
 elsif ($command =~ /^list\s+@(\S+)\s*(\S.*|)$/) { list_tasks($1, $2); }
-elsif ($command =~ /^list\s+(\S.*)$/)           { list_tasks(undef, $1); }
+elsif ($command =~ /^list\s+([^@\s].*)$/)       { list_tasks(undef, $1); }
 elsif ($command =~ /^add\s+@(\S+)\s+(\S.*)/)    { add_task($2, $1); }
-elsif ($command =~ /^add\s+(\S.*)/)             { add_task($1); }
+elsif ($command =~ /^add\s+([^@\s].*)/)         { add_task($1); }
 elsif ($command =~ /^change\s+(\d+)\s+(\S.*)/)  { change_task($1, $2); }
 elsif ($command =~ /^finish\s+(\d+)/)           { finish_task($1); }
 elsif ($command =~ /^revive\s+(\d+)/)           { revive_task($1); }
@@ -467,7 +467,7 @@ elsif ($command =~ /^help\s*$/)                 { display_help(); }
 elsif ($command =~ /^version\s*$/)              { display_version(); }
 else  {
   # Report invalid command:
-  exit_with_error("Invalid command: $command\n" .
+  exit_with_error("Invalid command or argument.\n" .
                   "Try `--help' for more information.", 22);
 }
 
