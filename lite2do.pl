@@ -25,18 +25,19 @@ use Term::ANSIColor;
 use Getopt::Long;
 
 # General script information:
-use constant NAME    => basename($0, '.pl');              # Script name.
-use constant VERSION => '1.0.0';                          # Script version.
+use constant NAME    => basename($0, '.pl');             # Script name.
+use constant VERSION => '1.0.0';                         # Script version.
 
 # General script settings:
-our $HOMEDIR   = $ENV{HOME} || $ENV{USERPROFILE} || '.';  # Home directory.
-our $savefile  = catfile($HOMEDIR, '.lite2do');           # Save file name.
-our $backext   = '.bak';                                  # Backup  suffix.
-our $coloured  = 0;                                       # Set up colours.
+our $HOMEDIR   = $ENV{HOME} || $ENV{USERPROFILE} || '.'; # Home directory.
+our $savefile  = catfile($HOMEDIR, '.lite2do');          # Save file name.
+our $backext   = '.bak';                                 # Backup suffix.
+our $verbose   = 1;                                      # Verbosity level.
+our $coloured  = 0;                                      # Set up colours.
 
 # Colours settings:
-our $done      = 'green';                                 # Finished tasks.
-our $undone    = 'magenta';                               # Undone tasks.
+our $done      = 'green';                                # Finished tasks.
+our $undone    = 'magenta';                              # Undone tasks.
 
 # Command line options:
 my ($command, $response);
@@ -80,6 +81,7 @@ Options:
                            ted options are: black, green, yellow, magenta,
                            red, blue, cyan, and white
   -u, --unfinished colour  use selected colour for unfinished tasks
+  -q, --quiet              avoid displaying unnecessary messages
   -h, --help               display this help and exit
   -v, --version            display version information and exit
 END_HELP
@@ -264,7 +266,7 @@ sub list_tasks {
   }
   else {
     # Report empty list:
-    print "No matching task found.\n";
+    print "No matching task found.\n" if $verbose;
   }
 
   # Return success:
@@ -284,7 +286,7 @@ sub add_task {
   add_data(\@data);
 
   # Report success:
-  print "Task has been successfully added with id $id.\n";
+  print "Task has been successfully added with id $id.\n" if $verbose;
 
   # Return success:
   return 1;
@@ -312,11 +314,11 @@ sub change_task {
     save_data(\@rest);
 
     # Report success:
-    print "Task has been successfully changed.\n";
+    print "Task has been successfully changed.\n" if $verbose;
   }
   else {
     # Report empty list:
-    print "No matching task found.\n";
+    print "No matching task found.\n" if $verbose;
   }
 
   # Return success:
@@ -344,11 +346,11 @@ sub finish_task {
     save_data(\@rest);
 
     # Report success:
-    print "Task has been finished.\n";
+    print "Task has been finished.\n" if $verbose;
   }
   else {
     # Report empty list:
-    print "No matching task found.\n";
+    print "No matching task found.\n" if $verbose;
   }
 
   # Return success:
@@ -376,11 +378,11 @@ sub revive_task {
     save_data(\@rest);
 
     # Report success:
-    print "Task has been revived.\n";
+    print "Task has been revived.\n" if $verbose;
   }
   else {
     # Report empty list:
-    print "No matching task found.\n";
+    print "No matching task found.\n" if $verbose;
   }
 
   # Return success:
@@ -402,11 +404,11 @@ sub remove_task {
     save_data(\@rest);
 
     # Report success:
-    print "Task has been successfully removed.\n";
+    print "Task has been successfully removed.\n" if $verbose;
   }
   else {
     # Report empty list:
-    print "No matching task found.\n";
+    print "No matching task found.\n" if $verbose;
   }
 
   # Return success:
@@ -418,11 +420,11 @@ sub revert_last_action {
   # Try to restore data from tha backup:
   if (move("$savefile$backext", $savefile)) {
     # Report success:
-    print "Last action has been successfully reverted.\n";
+    print "Last action has been successfully reverted.\n" if $verbose;
   }
   else {
     # Report failure:
-    print "Already at oldest change.\n";
+    print "Already at oldest change.\n" if $verbose;
   }
 
   # Return success:
@@ -439,6 +441,8 @@ GetOptions(
   'version|v'      => sub { display_version(); exit 0 },
 
   # Additional options:
+  'quiet|q'        => sub { $verbose = 0 },
+  'verbose|V'      => sub { $verbose = 1 },
   'savefile|s=s'   => \$savefile,
   'colour|color|c' => \$coloured,
   'finished|f=s'   => \$done,
@@ -559,6 +563,10 @@ Use selected I<colour> for unfinished tasks; available options are:
 B<black>, B<red>, B<green>, B<yellow>, B<blue>, B<magenta>, B<cyan> and
 B<white>.
 
+=item B<-q>, B<--quiet>
+
+Avoid displaying messages that are not necessary.
+
 =item B<-h>, B<--help>
 
 Display help message and exit.
@@ -589,8 +597,9 @@ B<w2do>(1), B<w2html>(1), B<w2text>(1), B<perl>(1).
 
 =head1 BUGS
 
-To report bugs or even send patches, please visit the project homepage:
-<http://gitorious.org/projects/lite2do/>.
+To report bugs or even send patches, please visit the project homepage
+<http://gitorious.org/projects/lite2do/> or contact the author directly via
+e-mail.
 
 =head1 AUTHOR
 
