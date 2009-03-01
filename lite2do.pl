@@ -37,7 +37,7 @@ our $coloured  = 0;                                      # Set up colours.
 
 # Colours settings:
 our $done      = 'green';                                # Finished tasks.
-our $undone    = 'magenta';                              # Undone tasks.
+our $undone    = '';                                     # Undone tasks.
 
 # Command line options:
 my ($command, $response);
@@ -75,7 +75,7 @@ Commands:
   undo                     revert last action
 
 Options:
-  -c, --colour             use coloured output; turned off by default
+  -c, --color, --colour    use coloured output; turned off by default
   -s, --savefile file      use selected file instead of default ~/.lite2do
   -f, --finished colour    use selected colour for finished tasks; suppor-
                            ted options are: black, green, yellow, magenta,
@@ -441,10 +441,11 @@ GetOptions(
   'version|v'      => sub { display_version(); exit 0 },
 
   # Additional options:
-  'quiet|q'        => sub { $verbose = 0 },
-  'verbose|V'      => sub { $verbose = 1 },
+  'verbose|V'      => sub { $verbose  = 1 },
+  'quiet|q'        => sub { $verbose  = 0 },
+  'colour|color|c' => sub { $coloured = 1 },
+  'plain|p'        => sub { $coloured = 0 },
   'savefile|s=s'   => \$savefile,
-  'colour|color|c' => \$coloured,
   'finished|f=s'   => \$done,
   'unfinished|u=s' => \$undone,
 );
@@ -543,14 +544,18 @@ Display version information.
 
 =over
 
-=item B<-c>, B<--colour>, B<--color>
-
-Use coloured output; this option is turned off by default, as most users do
-not usually fancy having bright colours in their terminal.
-
 =item B<-s> I<file>, B<--savefile> I<file>
 
 Use selected I<file> instead of the default I<~/.lite2do> as a save file.
+
+=item B<-c>, B<--colour>, B<--color>
+
+Use coloured output.
+
+=item B<-p>, B<--plain>
+
+Use plain-text output; this is the default option, as most users do not
+usually fancy having bright colours in their terminal.
 
 =item B<-f> I<colour>, B<--finished> I<colour>
 
@@ -566,6 +571,10 @@ B<white>.
 =item B<-q>, B<--quiet>
 
 Avoid displaying messages that are not necessary.
+
+=item B<-V>, B<--verbose>
+
+Display all messages; this is the default behaviour.
 
 =item B<-h>, B<--help>
 
