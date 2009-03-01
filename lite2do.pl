@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # lite2do, a lightweight text-based todo manager
-# Copyright (C) 2008 Jaromir Hradilek
+# Copyright (C) 2008, 2009 Jaromir Hradilek
 
 # This program is free software;  you can redistribute it  and/or modify it
 # under the  terms of the  GNU General Public License  as published  by the
@@ -380,7 +380,7 @@ sub revert_last_action {
 
 # Display given message and immediately terminate the script:
 sub exit_with_error {
-  my $message = shift || 'An unspecified error has occured.';
+  my $message = shift || 'An unspecified error has occurred.';
   my $retval  = shift || 1;
 
   print STDERR "$NAME: $message\n";
@@ -427,3 +427,148 @@ else  {
 
 # Return success:
 exit 0;
+
+__END__
+
+=head1 NAME
+
+lite2do - a lightweight text-based todo manager
+
+=head1 SYNOPSIS
+
+B<lite2do> [I<options>] I<command> [I<argument>...]
+
+B<lite2do> B<-h> | B<-v>
+
+=head1 DESCRIPTION
+
+B<lite2do> is a lightweight command-line todo manager written in Perl 5.
+Being based on w2do and fully compatible with its save file format, it
+tries to provide much simpler alternative for those who do not appreciate
+nor require w2do's complexity.
+
+=head1 COMMANDS
+
+=over
+
+=item B<list> [@I<group>] [I<text>...]
+
+Display items in the task list. All tasks are listed by default, but
+desired subset can be easily selected giving a group name, text pattern, or
+combination of both.
+
+=item B<add> [@I<group>] I<text>...
+
+Add new item to the task list.
+
+=item B<change> I<id> I<text>...
+
+Change item with selected I<id> in the task list.
+
+=item B<finish> I<id>
+
+Mark item with selected I<id> as finished.
+
+=item B<revive> I<id>
+
+Mark item with selected I<id> as unfinished.
+
+=item B<remove> I<id>
+
+Remove item with selected I<id> from the task list.
+
+=item B<undo>
+
+Revert last action. When invoked, the data are restored from the backup
+file (i.e. I<~/.lite2do.bak> by default), which is deleted at the same
+time.
+
+=item B<help>
+
+Display help message.
+
+=item B<version>
+
+Display version information.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-c>, B<--colour>, B<--color>
+
+Use coloured output; this option is turned off by default, as most users do
+not usually fancy having bright colours in their terminal.
+
+=item B<-s> I<file>, B<--savefile> I<file>
+
+Use selected I<file> instead of the default I<~/.lite2do> as a save file.
+
+=item B<-f> I<colour>, B<--finished> I<colour>
+
+Use selected I<colour> for finished tasks; available options are: B<black>,
+B<red>, B<green>, B<yellow>, B<blue>, B<magenta>, B<cyan> and B<white>.
+
+=item B<-u> I<colour>, B<--unfinished> I<colour>
+
+Use selected I<colour> for unfinished tasks; available options are:
+B<black>, B<red>, B<green>, B<yellow>, B<blue>, B<magenta>, B<cyan> and
+B<white>.
+
+=item B<-h>, B<--help>
+
+Display help message and exit.
+
+=item B<-v>, B<--version>
+
+Display version information and exit.
+
+=back
+
+=head1 FILES
+
+=over
+
+=item I<~/.lite2do>
+
+Default save file.
+
+=item I<~/.lite2do.bak>
+
+Default backup file.
+
+=back
+
+=head1 SEE ALSO
+
+B<w2do>(1), B<w2html>(1), B<w2text>(1), B<perl>(1).
+
+=head1 BUGS
+
+To report bugs or even send patches, please visit the project homepage:
+<http://gitorious.org/projects/lite2do/>.
+
+=head1 AUTHOR
+
+Written by Jaromir Hradilek <jhradilek@gmail.com>.
+
+Permission is granted to copy, distribute and/or modify this document under
+the terms of the GNU Free Documentation License, Version 1.3 or any later
+version published by the Free Software Foundation; with no Invariant
+Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+A copy of the license is included as a file called FDL in the main
+directory of the lite2do source package.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008, 2009 Jaromir Hradilek
+
+This program is free software; see the source for copying conditions. It is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut
