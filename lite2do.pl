@@ -68,7 +68,7 @@ Usage: $NAME [option...] command [argument...]
 Commands:
   list [\@group] [text...]  display items in the task list
   add  [\@group] text...    add new item to the task list
-  change id text...        change item in the task list
+  change id \@group|text... change item in the task list
   finish id                finish item in the task list
   revive id                revive item in the task list
   remove id                remove item from the task list
@@ -124,10 +124,8 @@ sub load_selection {
 
   # Open the save file for reading:
   if (open(SAVEFILE, "$savefile")) {
-
     # Process each line:
     while (my $line = <SAVEFILE>) {
-
       # Check whether the line matches given pattern:
       if ($line =~ /^$group:[^:]*:[1-5]:[ft]:.*$task.*:$id$/i) {
         # Add the line to selected tasks:
@@ -156,7 +154,6 @@ sub save_data {
 
   # Open the save file for writing:
   if (open(SAVEFILE, ">$savefile")) {
-
     # Write data to the save file:
     foreach my $line (@$data) {
       print SAVEFILE $line;
@@ -183,7 +180,6 @@ sub add_data {
 
   # Open the save file for appending:
   if (open(SAVEFILE, ">>$savefile")) {
-
     # Write data to the save file:
     foreach my $line (@$data) {
       print SAVEFILE $line;
@@ -208,7 +204,6 @@ sub choose_id {
 
   # Open the save file for reading:
   if (open(SAVEFILE, "$savefile")) {
-
     # Build the list of used IDs:
     while (my $line = <SAVEFILE>) {
       push(@used, int($1)) if ($line =~ /:(\d+)$/);
@@ -237,7 +232,6 @@ sub list_tasks {
 
   # Check whether the list is not empty:
   if (@selected) {
-
     # Process each task:
     foreach my $line (sort @selected) {
 
@@ -247,7 +241,6 @@ sub list_tasks {
       
       # Check whether to use coloured output:
       if ($coloured) {
-
         # Decide which colour to use:
         my $colour = ($2 eq 'f') ? $undone : $done;
 
@@ -294,8 +287,9 @@ sub add_task {
 
 # Change selected item in the task list:
 sub change_task {
-  my $id   = shift || die 'Missing argument';
-  my $task = shift || die 'Missing argument';
+  my $id    = shift || die 'Missing argument';
+  my $text  = shift || die 'Missing argument';
+  my $group = shift || 0;
   my (@selected, @rest);
 
   # Load tasks:
@@ -303,12 +297,18 @@ sub change_task {
 
   # Check whether the list is not empty:
   if (@selected) {
-
     # Parse the task record:
-    pop(@selected) =~ /^([^:]*):([^:]*):([1-5]):([ft]):.*:\d+$/;
+    pop(@selected) =~ /^([^:]*):([^:]*):([1-5]):([ft]):(.*):\d+$/;
 
-    # Update the task record:
-    push(@rest, "$1:$2:$3:$4:$task:$id\n");
+    # Decide which part to edit:
+    unless ($group) {
+      # Update the task record:
+      push(@rest, "$1:$2:$3:$4:$text:$id\n");
+    }
+    else {
+      # Update the group record:
+      push(@rest, substr($text, 0, 10) . ":$2:$3:$4:$5:$id\n");
+    }
 
     # Store data to the save file:
     save_data(\@rest);
@@ -335,7 +335,6 @@ sub finish_task {
 
   # Check whether the list is not empty:
   if (@selected) {
-
     # Parse the task record:
     pop(@selected) =~ /^([^:]*):([^:]*):([1-5]):[ft]:(.*):\d+$/;
 
@@ -367,7 +366,6 @@ sub revive_task {
 
   # Check whether the list is not empty:
   if (@selected) {
-
     # Parse the task record:
     pop(@selected) =~ /^([^:]*):([^:]*):([1-5]):[ft]:(.*):\d+$/;
 
@@ -399,7 +397,6 @@ sub remove_task {
 
   # Check whether the list is not empty:
   if (@selected) {
-
     # Store data to the save file:
     save_data(\@rest);
 
@@ -454,18 +451,58 @@ GetOptions(
 $command = join(' ', @ARGV);
 
 # Parse command:
-if    ($command =~ /^(|list)\s*$/)              { list_tasks(); }
-elsif ($command =~ /^list\s+@(\S+)\s*(\S.*|)$/) { list_tasks($1, $2); }
-elsif ($command =~ /^list\s+([^@\s].*)$/)       { list_tasks(undef, $1); }
-elsif ($command =~ /^add\s+@(\S+)\s+(\S.*)/)    { add_task($2, $1); }
-elsif ($command =~ /^add\s+([^@\s].*)/)         { add_task($1); }
-elsif ($command =~ /^change\s+(\d+)\s+(\S.*)/)  { change_task($1, $2); }
-elsif ($command =~ /^finish\s+(\d+)/)           { finish_task($1); }
-elsif ($command =~ /^revive\s+(\d+)/)           { revive_task($1); }
-elsif ($command =~ /^remove\s+(\d+)/)           { remove_task($1); }
-elsif ($command =~ /^undo\s*$/)                 { revert_last_action(); }
-elsif ($command =~ /^help\s*$/)                 { display_help(); }
-elsif ($command =~ /^version\s*$/)              { display_version(); }
+if    ($command =~ /^(|list)\s*$/) {
+  # List all items in the task list:
+  list_tasks();
+}
+elsif ($command =~ /^list\s+@(\S+)\s*(\S.*|)$/) {
+  # List items in the selected group, optionally matching the pattern:
+  list_tasks($1, $2);
+}
+elsif ($command =~ /^list\s+([^@\s].*)$/) {
+  # List items matching the pattern:
+  list_tasks(undef, $1);
+}
+elsif ($command =~ /^add\s+@(\S+)\s+(\S.*)/) {
+  # Add new item to the task list, belonging to the selected group:
+  add_task($2, $1);
+}
+elsif ($command =~ /^add\s+([^@\s].*)/) {
+  # Add new item to the task list, belonging to the default group:
+  add_task($1);
+}
+elsif ($command =~ /^change\s+(\d+)\s+@(\S+)\s*$/) {
+  # Change group the selected item in the task list belongs to:
+  change_task($1, $2, 1);
+}
+elsif ($command =~ /^change\s+(\d+)\s+([^@\s].*)/) {
+  # Change selected item in the task list:
+  change_task($1, $2);
+}
+elsif ($command =~ /^finish\s+(\d+)/) {
+  # Mark selected item in the task list as finished:
+  finish_task($1);
+}
+elsif ($command =~ /^revive\s+(\d+)/) {
+  # Mark selected item in the task list as unfinished:
+  revive_task($1);
+}
+elsif ($command =~ /^remove\s+(\d+)/) {
+  # Remove selected item from the task list:
+  remove_task($1);
+}
+elsif ($command =~ /^undo\s*$/) {
+  # Revert last action:
+  revert_last_action();
+}
+elsif ($command =~ /^help\s*$/) {
+  # Display usage information:
+  display_help();
+}
+elsif ($command =~ /^version\s*$/) {
+  # Display version information:
+  display_version();
+}
 else  {
   # Report invalid command:
   exit_with_error("Invalid command or argument.\n" .
@@ -512,6 +549,10 @@ Add new item to the task list.
 
 Change item with selected I<id> in the task list.
 
+=item B<change> I<id> @I<group>
+
+Change I<group> the item with selected I<id> belongs to.
+
 =item B<finish> I<id>
 
 Mark item with selected I<id> as finished.
@@ -554,7 +595,7 @@ Use coloured output.
 
 =item B<-p>, B<--plain>
 
-Use plain-text output; this is the default option, as most users do not
+Use plain-text output; this is the default behaviour, as most users do not
 usually fancy having bright colours in their terminal.
 
 =item B<-f> I<colour>, B<--finished> I<colour>
