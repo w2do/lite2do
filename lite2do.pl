@@ -451,17 +451,17 @@ GetOptions(
 $command = join(' ', @ARGV);
 
 # Parse command:
-if    ($command =~ /^(|list)\s*$/) {
+if    ($command =~ /^(|list|ls)\s*$/) {
   # List all items in the task list:
   list_tasks();
 }
-elsif ($command =~ /^list\s+@(\S+)\s*(\S.*|)$/) {
+elsif ($command =~ /^(list|ls)\s+@(\S+)\s*(\S.*|)$/) {
   # List items in the selected group, optionally matching the pattern:
-  list_tasks($1, $2);
+  list_tasks($2, $3);
 }
-elsif ($command =~ /^list\s+([^@\s].*)$/) {
+elsif ($command =~ /^(list|ls)\s+([^@\s].*)$/) {
   # List items matching the pattern:
-  list_tasks(undef, $1);
+  list_tasks(undef, $2);
 }
 elsif ($command =~ /^add\s+@(\S+)\s+(\S.*)/) {
   # Add new item to the task list, belonging to the selected group:
@@ -471,13 +471,13 @@ elsif ($command =~ /^add\s+([^@\s].*)/) {
   # Add new item to the task list, belonging to the default group:
   add_task($1);
 }
-elsif ($command =~ /^change\s+(\d+)\s+@(\S+)\s*$/) {
+elsif ($command =~ /^(change|mv)\s+(\d+)\s+@(\S+)\s*$/) {
   # Change group the selected item in the task list belongs to:
-  change_task($1, $2, 1);
+  change_task($2, $3, 1);
 }
-elsif ($command =~ /^change\s+(\d+)\s+([^@\s].*)/) {
+elsif ($command =~ /^(change|mv)\s+(\d+)\s+([^@\s].*)/) {
   # Change selected item in the task list:
-  change_task($1, $2);
+  change_task($2, $3);
 }
 elsif ($command =~ /^finish\s+(\d+)/) {
   # Mark selected item in the task list as finished:
@@ -487,9 +487,9 @@ elsif ($command =~ /^revive\s+(\d+)/) {
   # Mark selected item in the task list as unfinished:
   revive_task($1);
 }
-elsif ($command =~ /^remove\s+(\d+)/) {
+elsif ($command =~ /^(remove|rm)\s+(\d+)/) {
   # Remove selected item from the task list:
-  remove_task($1);
+  remove_task($2);
 }
 elsif ($command =~ /^undo\s*$/) {
   # Revert last action:
@@ -537,6 +537,8 @@ nor require w2do's complexity.
 
 =item B<list> [@I<group>] [I<text>...]
 
+=item B<ls> [@I<group>] [I<text>...]
+
 Display items in the task list. All tasks are listed by default, but
 desired subset can be easily selected giving a group name, text pattern, or
 combination of both.
@@ -547,9 +549,13 @@ Add new item to the task list.
 
 =item B<change> I<id> I<text>...
 
+=item B<mv> I<id> I<text>...
+
 Change item with selected I<id> in the task list.
 
 =item B<change> I<id> @I<group>
+
+=item B<mv> I<id> @I<group>
 
 Change I<group> the item with selected I<id> belongs to.
 
@@ -562,6 +568,8 @@ Mark item with selected I<id> as finished.
 Mark item with selected I<id> as unfinished.
 
 =item B<remove> I<id>
+
+=item B<rm> I<id>
 
 Remove item with selected I<id> from the task list.
 
