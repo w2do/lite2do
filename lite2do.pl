@@ -479,13 +479,13 @@ elsif ($command =~ /^(change|mv)\s+(\d+)\s+([^@\s].*)/) {
   # Change selected item in the task list:
   change_task($2, $3);
 }
-elsif ($command =~ /^finish\s+(\d+)/) {
+elsif ($command =~ /^(finish|fn)\s+(\d+)/) {
   # Mark selected item in the task list as finished:
-  finish_task($1);
+  finish_task($2);
 }
-elsif ($command =~ /^revive\s+(\d+)/) {
+elsif ($command =~ /^(revive|re)\s+(\d+)/) {
   # Mark selected item in the task list as unfinished:
-  revive_task($1);
+  revive_task($2);
 }
 elsif ($command =~ /^(remove|rm)\s+(\d+)/) {
   # Remove selected item from the task list:
@@ -540,8 +540,8 @@ nor require w2do's complexity.
 =item B<ls> [@I<group>] [I<text>...]
 
 Display items in the task list. All tasks are listed by default, but
-desired subset can be easily selected giving a group name, text pattern, or
-combination of both.
+desired subset can be easily selected giving a I<group> name, I<text>
+pattern, or combination of both.
 
 =item B<add> [@I<group>] I<text>...
 
@@ -561,9 +561,13 @@ Change I<group> the item with selected I<id> belongs to.
 
 =item B<finish> I<id>
 
+=item B<fn> I<id>
+
 Mark item with selected I<id> as finished.
 
 =item B<revive> I<id>
+
+=item B<re> I<id>
 
 Mark item with selected I<id> as unfinished.
 
@@ -655,9 +659,10 @@ B<w2do>(1), B<w2html>(1), B<w2text>(1), B<perl>(1).
 
 =head1 BUGS
 
-To report bugs or even send patches, please visit the project homepage
-<http://gitorious.org/projects/lite2do/> or contact the author directly via
-e-mail.
+To report bugs or even send patches, you can either add new issue to the
+project bugtracker at <http://code.google.com/p/w2do/issues/>, visit the
+discussion group at <http://groups.google.com/group/w2do/>, or you can
+contact the author directly via e-mail.
 
 =head1 AUTHOR
 
