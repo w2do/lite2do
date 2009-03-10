@@ -117,6 +117,9 @@ sub load_selection {
   $group =~ s/([\\\^\.\$\|\(\)\[\]\*\+\?\{\}])/\\$1/g if $group;
   $task  =~ s/([\\\^\.\$\|\(\)\[\]\*\+\?\{\}])/\\$1/g if $task;
 
+  # Remove colons if any:
+  $group =~ s/://g if $group;
+
   # Use default pattern when none is provided:
   $id    ||= '\d+';
   $group ||= '[^:]*';
@@ -222,6 +225,41 @@ sub choose_id {
   return $chosen;
 }
 
+# Fix the group name:
+sub fix_group {
+  my $group = shift || die 'Missing argument';
+
+  # Check whether it contains forbidden characters:
+  if ($group =~ /:/) {
+    # Display warning:
+    print STDERR "Colon is not allowed in the group name. Removing.\n";
+
+    # Remove forbidden characters:
+    $group =~ s/://g;
+  }
+
+  # Check the group name length:
+  if (length($group) > 10) {
+    # Display warning:
+    print STDERR "Group name too long. Stripping.\n";
+
+    # Strip it to the maximal allowed length:
+    $group = substr($group, 0, 10);
+  }
+
+  # Make sure the result is not empty:
+  unless ($group) {
+    # Display warning:
+    print STDERR "Group name is empty. Using the default group instead.\n";
+
+    # Use default group instead:
+    $group = 'general';
+  }
+
+  # Return the result:
+  return $group;
+}
+
 # List items in the task list:
 sub list_tasks {
   my ($group, $task) = @_;
@@ -234,7 +272,6 @@ sub list_tasks {
   if (@selected) {
     # Process each task:
     foreach my $line (sort @selected) {
-
       # Parse the task record:
       $line   =~ /^([^:]*):[^:]*:[1-5]:([ft]):(.*):(\d+)$/;
       $state  = ($2 eq 'f') ? '-' : 'f';
@@ -273,7 +310,7 @@ sub add_task {
   my $id    = choose_id();
 
   # Create the task record:
-  my @data  = (substr($group, 0, 10) . ":anytime:3:f:$task:$id\n");
+  my @data  = (fix_group($group) . ":anytime:3:f:$task:$id\n");
 
   # Add data to the end of the save file:
   add_data(\@data);
@@ -307,7 +344,7 @@ sub change_task {
     }
     else {
       # Update the group record:
-      push(@rest, substr($text, 0, 10) . ":$2:$3:$4:$5:$id\n");
+      push(@rest, fix_group($text) . ":$2:$3:$4:$5:$id\n");
     }
 
     # Store data to the save file:
