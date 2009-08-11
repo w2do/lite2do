@@ -90,6 +90,14 @@ sub display_help {
     print "Removes selected item from the task list.\n";
     print "Usage: $NAME remove ID\n";
   }
+  elsif ($command =~ /^undo$/) {
+    print "Reverts last action.\n";
+    print "Usage: $NAME undo\n";
+  }
+  elsif ($command =~ /^groups$/) {
+    print "Displays groups in the task list.\n";
+    print "Usage: $NAME groups\n";
+  }
   elsif ($command =~ /^version$/) {
     print "Displays version information.\n";
     print "Usage: $NAME version\n";
@@ -110,6 +118,7 @@ Commands:
   revive ID                revive item in the task list
   remove ID                remove item from the task list
   undo                     revert last action
+  groups                   display groups in the task list
   help [COMMAND]           display usage information
   version                  display version information
 
@@ -240,6 +249,38 @@ sub add_data {
   return 1;
 }
 
+# Get hash of all groups:
+sub get_groups {
+  my %groups = ();
+
+  # Open the save file for reading:
+  if (open(SAVEFILE, "$savefile")) {
+    # Build the list of used groups:
+    while (my $line = <SAVEFILE>) {
+      # Parse the task record:
+      if ($line =~ /^([^:]*):/) {
+        my $group = lc($1);
+
+        # Check whether the group is already added:
+        if ($groups{$group}) {
+          # Increment the counter:
+          $groups{$group} += 1;
+        }
+        else {
+          # Initialize the counter:
+          $groups{$group}  = 1;
+        }
+      }
+    }
+
+    # Close the save file:
+    close(SAVEFILE);
+  }
+
+  # Return the result:
+  return %groups;
+}
+
 # Choose first available ID:
 sub choose_id {
   my @used   = ();
@@ -333,6 +374,26 @@ sub list_tasks {
         printf "%2d. @%s [%s]: %s\n", $4, $1, $state, $3;
       }
     }
+  }
+  else {
+    # Report empty list:
+    print "No matching task found.\n" if $verbose;
+  }
+
+  # Return success:
+  return 1;
+}
+
+# List groups in the task list:
+sub list_groups {
+  # Get list of all groups:
+  my %groups = get_groups();
+
+  # Make sure the task list is not empty:
+  if (scalar(keys %groups)) {
+    # Display the list of groups:
+    print join(', ', map { "$_ (" . $groups{$_} . ")" }
+                     sort keys(%groups)), "\n";
   }
   else {
     # Report empty list:
@@ -582,6 +643,10 @@ elsif ($command =~ /^undo\s*$/) {
   # Revert last action:
   revert_last_action();
 }
+elsif ($command =~ /^groups\s*$/) {
+  # Display groups in the task list:
+  list_groups();
+}
 elsif ($command =~ /^version\s*$/) {
   # Display version information:
   display_version();
@@ -679,6 +744,11 @@ Remove item with selected I<id> from the task list.
 Revert last action. When invoked, the data are restored from the backup
 file (i.e. I<~/.lite2do.bak> by default), which is deleted at the same
 time.
+
+=item B<groups>
+
+Display list of groups in the task list along with the number of tasks
+belonging to them.
 
 =item B<help> [I<command>]
 

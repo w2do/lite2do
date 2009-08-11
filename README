@@ -67,6 +67,10 @@ The available commands are:
     Revert last action. When invoked, the data are restored from the backup
     file (i.e. ~/.lite2do.bak by default),  which is in turn deleted at the
     same time.
+
+  groups
+    Display list of groups in the task list  along with the number of tasks
+    belonging to them.
   
   help [COMMAND]
     Display usage information.  By default,  list of all supported commands
