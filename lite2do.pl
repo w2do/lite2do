@@ -64,7 +64,7 @@ sub display_help {
   # Parse command and display appropriate usage information:
   if ($command =~ /^(list|ls)$/) {
     print "Displays items in the task list.\n";
-    print "Usage: $NAME list [\@GROUP] [TEXT...]\n";
+    print "Usage: $NAME list [\@GROUP|%ID] [TEXT...]\n";
   }
   elsif ($command =~ /^add$/) {
     print "Adds new item to the task list.\n";
@@ -99,9 +99,9 @@ sub display_help {
 Usage: $NAME [OPTION...] COMMAND [ARGUMENT...]
 
 Commands:
-  list [\@GROUP] [TEXT...]  display items in the task list
-  add  [\@GROUP] TEXT...    add new item to the task list
-  change ID \@GROUP|TEXT... change item in the task list
+  list [\@GROUP|%ID] [TEXT] display items in the task list
+  add  [\@GROUP] TEXT       add new item to the task list
+  change ID \@GROUP|TEXT    change item in the task list
   finish ID                finish item in the task list
   revive ID                revive item in the task list
   remove ID                remove item from the task list
@@ -298,11 +298,11 @@ sub fix_group {
 
 # List items in the task list:
 sub list_tasks {
-  my ($group, $task) = @_;
+  my ($group, $task, $id) = @_;
   my (@selected, $state);
 
   # Load matching tasks:
-  load_selection(\@selected, undef, undef, $group, $task);
+  load_selection(\@selected, undef, $id, $group, $task);
 
   # Check whether the list is not empty:
   if (@selected) {
@@ -532,7 +532,11 @@ elsif ($command =~ /^(list|ls)\s+@(\S+)\s*(\S.*|)$/) {
   # List items in the selected group, optionally matching the pattern:
   list_tasks($2, $3);
 }
-elsif ($command =~ /^(list|ls)\s+([^@\s].*)$/) {
+elsif ($command =~ /^(list|ls)\s+%(\d+)/) {
+  # List item with selected ID:
+  list_tasks(undef, undef, $2);
+}
+elsif ($command =~ /^(list|ls)\s+([^@^%\s].*)$/) {
   # List items matching the pattern:
   list_tasks(undef, $2);
 }
@@ -544,23 +548,23 @@ elsif ($command =~ /^add\s+([^@\s].*)/) {
   # Add new item to the task list, belonging to the default group:
   add_task($1);
 }
-elsif ($command =~ /^(change|mv)\s+(\d+)\s+@(\S+)\s*$/) {
+elsif ($command =~ /^(change|mv)\s+%?(\d+)\s+@(\S+)\s*$/) {
   # Change group the selected item in the task list belongs to:
   change_task($2, $3, 1);
 }
-elsif ($command =~ /^(change|mv)\s+(\d+)\s+([^@\s].*)/) {
+elsif ($command =~ /^(change|mv)\s+%?(\d+)\s+([^@\s].*)/) {
   # Change selected item in the task list:
   change_task($2, $3);
 }
-elsif ($command =~ /^(finish|fn)\s+(\d+)/) {
+elsif ($command =~ /^(finish|fn)\s+%?(\d+)/) {
   # Mark selected item in the task list as finished:
   finish_task($2);
 }
-elsif ($command =~ /^(revive|re)\s+(\d+)/) {
+elsif ($command =~ /^(revive|re)\s+%?(\d+)/) {
   # Mark selected item in the task list as unfinished:
   revive_task($2);
 }
-elsif ($command =~ /^(remove|rm)\s+(\d+)/) {
+elsif ($command =~ /^(remove|rm)\s+%?(\d+)/) {
   # Remove selected item from the task list:
   remove_task($2);
 }
@@ -603,7 +607,7 @@ B<lite2do> B<-h> | B<-v>
 
 =head1 DESCRIPTION
 
-B<lite2do> is a lightweight command-line todo manager written in Perl 5.
+B<lite2do> is a lightweight command-line todo manager written in Perl.
 Being based on w2do and fully compatible with its save file format, it
 tries to provide much simpler alternative for those who do not appreciate
 nor require w2do's complexity.
@@ -619,6 +623,12 @@ nor require w2do's complexity.
 Display items in the task list. All tasks are listed by default, but
 desired subset can be easily selected giving a I<group> name, I<text>
 pattern, or combination of both.
+
+=item B<list> %I<id>
+
+=item B<ls> %I<id>
+
+Display task with selected I<id>.
 
 =item B<add> [@I<group>] I<text>...
 

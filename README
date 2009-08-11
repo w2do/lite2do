@@ -16,7 +16,7 @@
 
 1. About the Script
 
-lite2do is a lightweight command-line todo manager written in Perl 5. Being
+lite2do  is a lightweight command-line todo manager written in Perl.  Being
 based on w2do and fully  compatible with its save file format,  it tries to
 provide much simpler alternative for those who do not appreciate nor requi-
 re w2do's complexity.
@@ -35,6 +35,10 @@ The available commands are:
     Display items  in the task list.  All tasks are listed by default,  but
     desired subset can be easily selected giving a group name, text pattern
     or combination of both.
+
+  list %ID
+  ls %ID
+    Display task with selected id.
 
   add [@GROUP] TEXT...
     Add new item to the task list.
