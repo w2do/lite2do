@@ -26,37 +26,37 @@ re w2do's complexity.
 
 The basic usage is as follows:
 
-  lite2do [option...] command [argument...]
+  lite2do [OPTION...] COMMAND [ARGUMENT...]
 
 The available commands are:
 
-  list [@group] [text...]
-  ls [@group] [text...]
+  list [@GROUP] [TEXT...]
+  ls [@GROUP] [TEXT...]
     Display items  in the task list.  All tasks are listed by default,  but
     desired subset can be easily selected giving a group name, text pattern
     or combination of both.
 
-  add [@group] text...
+  add [@GROUP] TEXT...
     Add new item to the task list.
 
-  change id text...
-  mv id text...
+  change ID TEXT...
+  mv ID TEXT...
     Change item with selected id in the task list.
 
-  change id @group
-  mv id @group
+  change ID @GROUP
+  mv ID @GROUP
     Change group the item with selected id belongs to.
 
-  finish id
-  fn id
+  finish ID
+  fn ID
     Mark item with selected id as finished.
 
-  revive id
-  re id
+  revive ID
+  re ID
     Mark item with selected id as unfinished.
 
-  remove id
-  rm id
+  remove ID
+  rm ID
     Remove item with selected id from the task list.
 
   undo
@@ -64,8 +64,10 @@ The available commands are:
     file (i.e. ~/.lite2do.bak by default),  which is in turn deleted at the
     same time.
   
-  help
-    Display help message.
+  help [COMMAND]
+    Display usage information.  By default,  list of all supported commands
+    and command-line options is displayed. If the command is supplied, fur-
+    ther information on its usage are displayed instead.
 
   version
     Display version information.

@@ -58,33 +58,69 @@ sub exit_with_error {
 
 # Display script help:
 sub display_help {
-  my $NAME = NAME;
+  my $command = shift || '';
+  my $NAME    = NAME;
 
-  # Print message to the STDOUT:
-  print << "END_HELP";
-Usage: $NAME [option...] command [argument...]
-       $NAME -h | -v
+  # Parse command and display appropriate usage information:
+  if ($command =~ /^(list|ls)$/) {
+    print "Displays items in the task list.\n";
+    print "Usage: $NAME list [\@GROUP] [TEXT...]\n";
+  }
+  elsif ($command =~ /^add$/) {
+    print "Adds new item to the task list.\n";
+    print "Usage: $NAME add [\@GROUP] TEXT...\n";
+  }
+  elsif ($command =~ /^(change|mv)$/) {
+    print "Changes selected item in the task list.\n";
+    print "Usage: $NAME change ID \@GROUP|TEXT...\n";
+  }
+  elsif ($command =~ /^(finish|fn)$/) {
+    print "Finishes selected item in the task list.\n";
+    print "Usage: $NAME finish ID\n";
+  }
+  elsif ($command =~ /^(revive|re)$/) {
+    print "Revives selected item in the task list.\n";
+    print "Usage: $NAME revive ID\n";
+  }
+  elsif ($command =~ /^(remove|rm)$/) {
+    print "Removes selected item from the task list.\n";
+    print "Usage: $NAME remove ID\n";
+  }
+  elsif ($command =~ /^version$/) {
+    print "Displays version information.\n";
+    print "Usage: $NAME version\n";
+  }
+  elsif ($command =~ /^help$/) {
+    print "Displays usage information.\n";
+    print "Usage: $NAME help [COMMAND]\n";
+  }
+  else {
+    print << "END_HELP";
+Usage: $NAME [OPTION...] COMMAND [ARGUMENT...]
 
 Commands:
-  list [\@group] [text...]  display items in the task list
-  add  [\@group] text...    add new item to the task list
-  change id \@group|text... change item in the task list
-  finish id                finish item in the task list
-  revive id                revive item in the task list
-  remove id                remove item from the task list
+  list [\@GROUP] [TEXT...]  display items in the task list
+  add  [\@GROUP] TEXT...    add new item to the task list
+  change ID \@GROUP|TEXT... change item in the task list
+  finish ID                finish item in the task list
+  revive ID                revive item in the task list
+  remove ID                remove item from the task list
   undo                     revert last action
+  help [COMMAND]           display usage information
+  version                  display version information
 
 Options:
   -c, --color, --colour    use coloured output; turned off by default
-  -s, --savefile file      use selected file instead of default ~/.lite2do
-  -f, --finished colour    use selected colour for finished tasks; suppor-
+  -s, --savefile FILE      use selected file instead of default ~/.lite2do
+  -f, --finished COLOUR    use selected colour for finished tasks; suppor-
                            ted options are: black, green, yellow, magenta,
                            red, blue, cyan, and white
-  -u, --unfinished colour  use selected colour for unfinished tasks
+  -u, --unfinished COLOUR  use selected colour for unfinished tasks
   -q, --quiet              avoid displaying unnecessary messages
   -h, --help               display this help and exit
   -v, --version            display version information and exit
 END_HELP
+  }
 
   # Return success:
   return 1;
@@ -282,11 +318,11 @@ sub list_tasks {
         my $colour = ($2 eq 'f') ? $undone : $done;
 
         # Print the task entry:
-        print  colored (sprintf("%2d. ", $4), "bold"),
-               colored ("\@$1 ",              "bold $colour"),
-               colored ("[$state]",           "bold"),
-               colored (": $3",               "$colour"),
-               "\n";
+        print colored (sprintf("%2d. ", $4), "bold"),
+              colored ("\@$1 ",              "bold $colour"),
+              colored ("[$state]",           "bold"),
+              colored (": $3",               "$colour"),
+              "\n";
       }
       else {
         # Print the task entry:
@@ -532,13 +568,17 @@ elsif ($command =~ /^undo\s*$/) {
   # Revert last action:
   revert_last_action();
 }
-elsif ($command =~ /^help\s*$/) {
-  # Display usage information:
-  display_help();
-}
 elsif ($command =~ /^version\s*$/) {
   # Display version information:
   display_version();
+}
+elsif ($command =~ /^help\s*$/) {
+  # Display list of all supported commands and command-line options:
+  display_help();
+}
+elsif ($command =~ /^help\s+(\S+)/) {
+  # Display information on a specific command:
+  display_help($1);
 }
 else  {
   # Report invalid command:
@@ -620,9 +660,11 @@ Revert last action. When invoked, the data are restored from the backup
 file (i.e. I<~/.lite2do.bak> by default), which is deleted at the same
 time.
 
-=item B<help>
+=item B<help> [I<command>]
 
-Display help message.
+Display usage information. By default, list of all supported commands and
+command-line options is displayed. If the I<command> is supplied, further
+information on its usage are displayed instead.
 
 =item B<version>
 
