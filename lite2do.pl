@@ -39,6 +39,10 @@ our $coloured  = 0;                                      # Set up colours.
 our $done      = 'green';                                # Finished tasks.
 our $undone    = '';                                     # Undone tasks.
 
+# Allowed colours:
+my  %valid     = map { $_, 1 } qw( black green yellow magenta red blue
+                                   cyan  white );
+
 # Command line options:
 my ($command, $response);
 
@@ -519,6 +523,12 @@ GetOptions(
   'finished|f=s'   => \$done,
   'unfinished|u=s' => \$undone,
 );
+
+# Check whether the supplied colour is valid:
+unless ((!$done || $valid{$done}) && (!$undone || $valid{$undone})) {
+  exit_with_error("Invalid colour option.\n" .
+                  "Try `--help' for more information.", 22);
+}
 
 # Get command line arguments:
 $command = join(' ', @ARGV);
