@@ -90,11 +90,11 @@ sub display_help {
     print "Removes selected item from the task list.\n";
     print "Usage: $NAME remove ID\n";
   }
-  elsif ($command =~ /^undo$/) {
+  elsif ($command =~ /^(undo|ud)$/) {
     print "Reverts last action.\n";
     print "Usage: $NAME undo\n";
   }
-  elsif ($command =~ /^groups$/) {
+  elsif ($command =~ /^(groups|gr)$/) {
     print "Displays groups in the task list.\n";
     print "Usage: $NAME groups\n";
   }
