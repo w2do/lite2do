@@ -64,11 +64,13 @@ The available commands are:
     Remove item with selected id from the task list.
 
   undo
+  ud
     Revert last action. When invoked, the data are restored from the backup
     file (i.e. ~/.lite2do.bak by default),  which is in turn deleted at the
     same time.
 
   groups
+  gr
     Display list of groups in the task list  along with the number of tasks
     belonging to them.
   

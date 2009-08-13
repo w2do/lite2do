@@ -639,11 +639,11 @@ elsif ($command =~ /^(remove|rm)\s+%?(\d+)/) {
   # Remove selected item from the task list:
   remove_task($2);
 }
-elsif ($command =~ /^undo\s*$/) {
+elsif ($command =~ /^(undo|ud)\s*$/) {
   # Revert last action:
   revert_last_action();
 }
-elsif ($command =~ /^groups\s*$/) {
+elsif ($command =~ /^(groups|gr)\s*$/) {
   # Display groups in the task list:
   list_groups();
 }
@@ -741,11 +741,15 @@ Remove item with selected I<id> from the task list.
 
 =item B<undo>
 
+=item B<ud>
+
 Revert last action. When invoked, the data are restored from the backup
 file (i.e. I<~/.lite2do.bak> by default), which is deleted at the same
 time.
 
 =item B<groups>
+
+=item B<gr>
 
 Display list of groups in the task list along with the number of tasks
 belonging to them.
